@@ -1,20 +1,39 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { isDev } from "./utils.js";
 import { createTray } from "./tray.js";
-import { createMenu } from "./menu.js";
 
 app.on("ready", () => {
-  const mainWindow = new BrowserWindow({});
+  const mainWindow = new BrowserWindow({
+    width: 1600,
+    height: 900,
+    frame: false,
+    webPreferences: {
+      preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
+    },
+  });
   if (isDev()) {
     mainWindow.loadURL("http://localhost:8080");
   } else {
     mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   }
 
+  ipcMain.on("minimize", () => {
+    mainWindow.minimize();
+  });
+
+  ipcMain.on("close", () => {
+    mainWindow.close();
+  });
+
+  ipcMain.on("toggleFullScreen", () => {
+    if (mainWindow) {
+      mainWindow.setFullScreen(!mainWindow.isFullScreen());
+    }
+  });
+
   createTray(mainWindow);
   handleCloseEvents(mainWindow);
-  createMenu(mainWindow);
 });
 
 function handleCloseEvents(mainWindow: BrowserWindow) {
