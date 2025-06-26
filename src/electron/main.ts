@@ -8,9 +8,13 @@ app.on("ready", () => {
     width: 1600,
     height: 900,
     frame: false,
+    resizable: true,
+    autoHideMenuBar: true,
+    icon: path.join(app.getAppPath(), "/luminescence_icon.png"),
     webPreferences: {
       preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
     },
+    transparent: true,
   });
   if (isDev()) {
     mainWindow.loadURL("http://localhost:8080");
