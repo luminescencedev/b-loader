@@ -1,49 +1,52 @@
+import MenuBar from "./MenuBar";
+import { cn } from "../utils/cn";
 const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
 
-import {
-  VscChromeMaximize,
-  VscChromeClose,
-  VscChromeMinimize,
-} from "react-icons/vsc";
-
-export default function TitleBar() {
+const TitleBar: React.FC = () => {
   return (
-    <>
-      <div
-        className="h-[4vh] w-screen flex items-center justify-between bg-zinc-900/50 text-zinc-50 "
-        style={drag}
-      >
-        <div>
-          <img src="" />
-        </div>
-        <div className="flex ">
+    <div
+      className={cn(
+        "h-8 w-screen flex items-center justify-between text-zinc-00"
+      )}
+      style={drag}
+    >
+      <div className="flex items-center" style={{ height: "100%" }}>
+        <img
+          src="/luminescence_icon.png"
+          alt=""
+          className={cn("h-5 w-auto max-h-full mx-3")}
+          style={{ maxHeight: "h-6", objectFit: "contain" }}
+        />
+        <MenuBar />
+      </div>
+      <div className="flex items-center pl-3 space-x-2 mr-4">
+        <div className={cn("flex space-x-2")} style={noDrag}>
           <button
-            className="h-[4vh] w-[5vh] flex items-center justify-center hover:bg-zinc-800"
-            onClick={() => window.electronAPI.minimize()}
+            onClick={() => window.electron.ipcRenderer.send("minimize")}
+            className={cn(
+              "w-3 h-3 bg-yellow-500 rounded-full flex items-center justify-center hover:brightness-90 transition-all"
+            )}
             aria-label="Minimize"
-            style={noDrag}
-          >
-            <VscChromeMinimize />
-          </button>
+          ></button>
           <button
-            className="h-[4vh] w-[5vh] flex items-center justify-center hover:bg-zinc-800"
-            onClick={() => window.electronAPI.toggleFullScreen()}
-            aria-label="Toggle FullScreen"
-            style={noDrag}
-          >
-            <VscChromeMaximize />
-          </button>
+            onClick={() => window.electron.ipcRenderer.send("maximize")}
+            className={cn(
+              "w-3 h-3 bg-green-500 rounded-full flex items-center justify-center hover:brightness-90 transition-all"
+            )}
+            aria-label="Maximize"
+          ></button>
           <button
-            className="h-[4vh] w-[5vh] flex items-center justify-center hover:bg-red-700"
-            onClick={() => window.electronAPI.close()}
+            onClick={() => window.electron.ipcRenderer.send("close")}
+            className={cn(
+              "w-3 h-3 bg-red-500 rounded-full flex items-center justify-center hover:brightness-90 transition-all"
+            )}
             aria-label="Close"
-            style={noDrag}
-          >
-            <VscChromeClose />
-          </button>
+          ></button>
         </div>
       </div>
-    </>
+    </div>
   );
-}
+};
+
+export default TitleBar;

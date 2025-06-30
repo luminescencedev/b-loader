@@ -3,24 +3,38 @@ import path from "path";
 import { isDev } from "./utils.js";
 import { createTray } from "./tray.js";
 
-app.on("ready", () => {
+function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 900,
+    width: 1200,
+    height: 700,
     frame: false,
     resizable: true,
     autoHideMenuBar: true,
     icon: path.join(app.getAppPath(), "/luminescence_icon.png"),
     webPreferences: {
       preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
-    transparent: true,
+
+    show: false,
   });
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
+  });
+
   if (isDev()) {
     mainWindow.loadURL("http://localhost:8080");
   } else {
     mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   }
+
+  return mainWindow;
+}
+
+app.whenReady().then(() => {
+  const mainWindow = createWindow();
 
   ipcMain.on("minimize", () => {
     mainWindow.minimize();
@@ -30,13 +44,20 @@ app.on("ready", () => {
     mainWindow.close();
   });
 
-  ipcMain.on("toggleFullScreen", () => {
+  ipcMain.on("maximize", () => {
     if (mainWindow) {
-      mainWindow.setFullScreen(!mainWindow.isFullScreen());
+      if (!mainWindow.isMaximized()) {
+        mainWindow.maximize();
+      } else {
+        mainWindow.unmaximize();
+      }
     }
   });
 
+  // Add handler for showing menus
+
   createTray(mainWindow);
+
   handleCloseEvents(mainWindow);
 });
 
